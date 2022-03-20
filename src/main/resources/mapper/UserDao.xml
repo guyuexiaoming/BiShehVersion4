@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zut.dao.UserDao">
+
+    <resultMap type="com.zut.entity.User" id="UserMap">
+        <result property="userId" column="user_id" jdbcType="DOUBLE"/>
+        <result property="userName" column="user_name" jdbcType="VARCHAR"/>
+        <result property="userPassword" column="user_password" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="phone" column="phone" jdbcType="VARCHAR"/>
+        <result property="carnumber" column="carnumber" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="UserMap">
+        select
+          user_id, user_name, user_password, name, phone, carnumber
+        from user
+        where user_id = #{userId}
+    </select>
+
+    <select id="selectById" resultMap="UserMap">
+        select *
+        from user
+        where user_id = #{userId}
+    </select>
+
+    <!--查询所有-->
+    <select id="queryAll" resultMap="UserMap">
+        select *
+        from user
+    </select>
+
+    <!--插入数据-->
+    <select id="insertUser" >
+        insert into user(user_name, user_password, name, phone, carnumber)
+        values (#{userName}, #{userPassword}, #{name}, #{phone}, #{carnumber})
+    </select>
+
+
+
+
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="userId" useGeneratedKeys="true">
+        insert into user(user_name, user_password, name, phone, carnumber)
+        values (#{userName}, #{userPassword}, #{name}, #{phone}, #{carnumber})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="userId" useGeneratedKeys="true">
+        insert into user(user_name, user_password, name, phone, carnumber)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+        (#{entity.userName}, #{entity.userPassword}, #{entity.name}, #{entity.phone}, #{entity.carnumber})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="userId" useGeneratedKeys="true">
+        insert into user(user_name, user_password, name, phone, carnumber)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.userName}, #{entity.userPassword}, #{entity.name}, #{entity.phone}, #{entity.carnumber})
+        </foreach>
+        on duplicate key update
+        user_name = values(user_name),
+        user_password = values(user_password),
+        name = values(name),
+        phone = values(phone),
+        carnumber = values(carnumber)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update user
+        <set>
+            <if test="userName != null and userName != ''">
+                user_name = #{userName},
+            </if>
+            <if test="userPassword != null and userPassword != ''">
+                user_password = #{userPassword},
+            </if>
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+            <if test="phone != null">
+                phone = #{phone},
+            </if>
+            <if test="carnumber != null">
+                carnumber = #{carnumber},
+            </if>
+        </set>
+        where user_id = #{userId}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from user where user_id = #{userId}
+    </delete>
+
+</mapper>
+

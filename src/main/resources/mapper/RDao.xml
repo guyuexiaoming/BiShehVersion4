@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zut.dao.RDao">
+
+    <resultMap type="com.zut.entity.R" id="RMap">
+        <result property="rId" column="r_id" jdbcType="INTEGER"/>
+        <result property="pId" column="p_id" jdbcType="INTEGER"/>
+        <result property="cwId" column="Cw_id" jdbcType="INTEGER"/>
+        <result property="rTime" column="r_time" jdbcType="TIMESTAMP"/>
+        <result property="rName" column="r_name" jdbcType="VARCHAR"/>
+        <result property="rMoney" column="r_money" jdbcType="INTEGER"/>
+        <result property="rOpinion" column="r_opinion" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="RMap">
+        select
+          r_id, p_id, Cw_id, r_time, r_name, r_money, r_opinion
+        from r
+        where r_id = #{rId}
+    </select>
+
+    <!--查询某段时间内的金额总数-->
+    <select id="querySumMoney" resultType="java.lang.Integer">
+        SELECT sum(r.r_money) as money FROM r
+        WHERE r_time BETWEEN #{bTime} AND #{eTime}
+    </select>
+
+    <select id="queryAll" resultMap="RMap">
+        select *
+        from r
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="RMap">
+        select
+          r_id, p_id, Cw_id, r_time, r_name, r_money, r_opinion
+        from r
+        <where>
+            <if test="rId != null">
+                and r_id = #{rId}
+            </if>
+            <if test="pId != null">
+                and p_id = #{pId}
+            </if>
+            <if test="cwId != null">
+                and Cw_id = #{cwId}
+            </if>
+            <if test="rTime != null">
+                and r_time = #{rTime}
+            </if>
+            <if test="rName != null and rName != ''">
+                and r_name = #{rName}
+            </if>
+            <if test="rMoney != null">
+                and r_money = #{rMoney}
+            </if>
+            <if test="rOpinion != null and rOpinion != ''">
+                and r_opinion = #{rOpinion}
+            </if>
+        </where>
+        limit #{pageable.offset}, #{pageable.pageSize}
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(1)
+        from r
+        <where>
+            <if test="rId != null">
+                and r_id = #{rId}
+            </if>
+            <if test="pId != null">
+                and p_id = #{pId}
+            </if>
+            <if test="cwId != null">
+                and Cw_id = #{cwId}
+            </if>
+            <if test="rTime != null">
+                and r_time = #{rTime}
+            </if>
+            <if test="rName != null and rName != ''">
+                and r_name = #{rName}
+            </if>
+            <if test="rMoney != null">
+                and r_money = #{rMoney}
+            </if>
+            <if test="rOpinion != null and rOpinion != ''">
+                and r_opinion = #{rOpinion}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="rId" useGeneratedKeys="true">
+        insert into r(p_id, Cw_id, r_time, r_name, r_money, r_opinion)
+        values (#{pId}, #{cwId}, #{rTime}, #{rName}, #{rMoney}, #{rOpinion})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="rId" useGeneratedKeys="true">
+        insert into r(p_id, Cw_id, r_time, r_name, r_money, r_opinion)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+        (#{entity.pId}, #{entity.cwId}, #{entity.rTime}, #{entity.rName}, #{entity.rMoney}, #{entity.rOpinion})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="rId" useGeneratedKeys="true">
+        insert into r(p_id, Cw_id, r_time, r_name, r_money, r_opinion)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.pId}, #{entity.cwId}, #{entity.rTime}, #{entity.rName}, #{entity.rMoney}, #{entity.rOpinion})
+        </foreach>
+        on duplicate key update
+        p_id = values(p_id),
+        Cw_id = values(Cw_id),
+        r_time = values(r_time),
+        r_name = values(r_name),
+        r_money = values(r_money),
+        r_opinion = values(r_opinion)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update r
+        <set>
+            <if test="pId != null">
+                p_id = #{pId},
+            </if>
+            <if test="cwId != null">
+                Cw_id = #{cwId},
+            </if>
+            <if test="rTime != null">
+                r_time = #{rTime},
+            </if>
+            <if test="rName != null and rName != ''">
+                r_name = #{rName},
+            </if>
+            <if test="rMoney != null">
+                r_money = #{rMoney},
+            </if>
+            <if test="rOpinion != null and rOpinion != ''">
+                r_opinion = #{rOpinion},
+            </if>
+        </set>
+        where r_id = #{rId}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from r where r_id = #{rId}
+    </delete>
+
+</mapper>
+

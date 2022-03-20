@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zut.dao.PDao">
+
+    <resultMap type="com.zut.entity.P" id="PMap">
+        <result property="pId" column="p_id" jdbcType="INTEGER"/>
+        <result property="pName" column="p_name" jdbcType="VARCHAR"/>
+        <result property="pPassword" column="p_password" jdbcType="VARCHAR"/>
+        <result property="pPhone" column="p_phone" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="PMap">
+        select
+          p_id, p_name, p_password, p_phone
+        from p
+        where p_id = #{pId}
+    </select>
+
+    <!--查询所有-->
+    <select id="queryAll" resultMap="PMap">
+        select *
+        from p
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="PMap">
+        select
+          p_id, p_name, p_password, p_phone
+        from p
+        <where>
+            <if test="pId != null">
+                and p_id = #{pId}
+            </if>
+            <if test="pName != null and pName != ''">
+                and p_name = #{pName}
+            </if>
+            <if test="pPassword != null and pPassword != ''">
+                and p_password = #{pPassword}
+            </if>
+            <if test="pPhone != null">
+                and p_phone = #{pPhone}
+            </if>
+        </where>
+        limit #{pageable.offset}, #{pageable.pageSize}
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(1)
+        from p
+        <where>
+            <if test="pId != null">
+                and p_id = #{pId}
+            </if>
+            <if test="pName != null and pName != ''">
+                and p_name = #{pName}
+            </if>
+            <if test="pPassword != null and pPassword != ''">
+                and p_password = #{pPassword}
+            </if>
+            <if test="pPhone != null">
+                and p_phone = #{pPhone}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="pId" useGeneratedKeys="true">
+        insert into p(p_name, p_password, p_phone)
+        values (#{pName}, #{pPassword}, #{pPhone})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="pId" useGeneratedKeys="true">
+        insert into p(p_name, p_password, p_phone)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+        (#{entity.pName}, #{entity.pPassword}, #{entity.pPhone})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="pId" useGeneratedKeys="true">
+        insert into p(p_name, p_password, p_phone)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.pName}, #{entity.pPassword}, #{entity.pPhone})
+        </foreach>
+        on duplicate key update
+        p_name = values(p_name),
+        p_password = values(p_password),
+        p_phone = values(p_phone)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update p
+        <set>
+            <if test="pName != null and pName != ''">
+                p_name = #{pName},
+            </if>
+            <if test="pPassword != null and pPassword != ''">
+                p_password = #{pPassword},
+            </if>
+            <if test="pPhone != null">
+                p_phone = #{pPhone},
+            </if>
+        </set>
+        where p_id = #{pId}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from p where p_id = #{pId}
+    </delete>
+
+</mapper>
+

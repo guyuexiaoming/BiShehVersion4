@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zut.dao.ManagerDao">
+
+    <resultMap type="com.zut.entity.Manager" id="ManagerMap">
+        <result property="username" column="username" jdbcType="VARCHAR"/>
+        <result property="password" column="password" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="ManagerMap">
+        select
+          username, password
+        from manager
+        where username = #{username}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="ManagerMap">
+        select
+          username, password
+        from manager
+        <where>
+            <if test="username != null and username != ''">
+                and username = #{username}
+            </if>
+            <if test="password != null and password != ''">
+                and password = #{password}
+            </if>
+        </where>
+        limit #{pageable.offset}, #{pageable.pageSize}
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(1)
+        from manager
+        <where>
+            <if test="username != null and username != ''">
+                and username = #{username}
+            </if>
+            <if test="password != null and password != ''">
+                and password = #{password}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="username" useGeneratedKeys="true">
+        insert into manager(password)
+        values (#{password})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="username" useGeneratedKeys="true">
+        insert into manager(password)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+        (#{entity.password})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="username" useGeneratedKeys="true">
+        insert into manager(password)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.password})
+        </foreach>
+        on duplicate key update
+        password = values(password)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update manager
+        <set>
+            <if test="password != null and password != ''">
+                password = #{password},
+            </if>
+        </set>
+        where username = #{username}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from manager where username = #{username}
+    </delete>
+
+</mapper>
+

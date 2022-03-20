@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zut.dao.CarmateDao">
+
+    <resultMap type="com.zut.entity.Carmate" id="CarmateMap">
+        <result property="carId" column="car_id" jdbcType="INTEGER"/>
+        <result property="carNumber" column="car_number" jdbcType="VARCHAR"/>
+        <result property="coupon" column="coupon" jdbcType="INTEGER"/>
+        <result property="inTime" column="in_time" jdbcType="TIMESTAMP"/>
+        <result property="outTime" column="out_time" jdbcType="TIMESTAMP"/>
+        <result property="costmoney" column="costmoney" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="CarmateMap">
+        select
+          car_id, car_number, coupon, in_time, out_time, costmoney
+        from carmate
+        where car_id = #{carId}
+    </select>
+
+    <!--查询所有-->
+    <select id="queryAll" resultType="com.zut.entity.Carmate">
+        select * from carmate
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="CarmateMap">
+        select
+          car_id, car_number, coupon, in_time, out_time, costmoney
+        from carmate
+        <where>
+            <if test="carId != null">
+                and car_id = #{carId}
+            </if>
+            <if test="carNumber != null and carNumber != ''">
+                and car_number = #{carNumber}
+            </if>
+            <if test="coupon != null">
+                and coupon = #{coupon}
+            </if>
+            <if test="inTime != null">
+                and in_time = #{inTime}
+            </if>
+            <if test="outTime != null">
+                and out_time = #{outTime}
+            </if>
+            <if test="costmoney != null">
+                and costmoney = #{costmoney}
+            </if>
+        </where>
+        limit #{pageable.offset}, #{pageable.pageSize}
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(1)
+        from carmate
+        <where>
+            <if test="carId != null">
+                and car_id = #{carId}
+            </if>
+            <if test="carNumber != null and carNumber != ''">
+                and car_number = #{carNumber}
+            </if>
+            <if test="coupon != null">
+                and coupon = #{coupon}
+            </if>
+            <if test="inTime != null">
+                and in_time = #{inTime}
+            </if>
+            <if test="outTime != null">
+                and out_time = #{outTime}
+            </if>
+            <if test="costmoney != null">
+                and costmoney = #{costmoney}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="carId" useGeneratedKeys="true">
+        insert into carmate(car_number, coupon, in_time, out_time, costmoney)
+        values (#{carNumber}, #{coupon}, #{inTime}, #{outTime}, #{costmoney})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="carId" useGeneratedKeys="true">
+        insert into carmate(car_number, coupon, in_time, out_time, costmoney)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+        (#{entity.carNumber}, #{entity.coupon}, #{entity.inTime}, #{entity.outTime}, #{entity.costmoney})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="carId" useGeneratedKeys="true">
+        insert into carmate(car_number, coupon, in_time, out_time, costmoney)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.carNumber}, #{entity.coupon}, #{entity.inTime}, #{entity.outTime}, #{entity.costmoney})
+        </foreach>
+        on duplicate key update
+        car_number = values(car_number),
+        coupon = values(coupon),
+        in_time = values(in_time),
+        out_time = values(out_time),
+        costmoney = values(costmoney)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update carmate
+        <set>
+            <if test="carNumber != null and carNumber != ''">
+                car_number = #{carNumber},
+            </if>
+            <if test="coupon != null">
+                coupon = #{coupon},
+            </if>
+            <if test="inTime != null">
+                in_time = #{inTime},
+            </if>
+            <if test="outTime != null">
+                out_time = #{outTime},
+            </if>
+            <if test="costmoney != null">
+                costmoney = #{costmoney},
+            </if>
+        </set>
+        where car_id = #{carId}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from carmate where car_id = #{carId}
+    </delete>
+
+</mapper>
+
